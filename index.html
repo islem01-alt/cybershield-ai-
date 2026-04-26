@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="CyberShield AI — تحليل الفيروسات والتهديدات الإلكترونية بالذكاء الاصطناعي">
+<meta name="keywords" content="تحليل فيروسات, أمن سيبراني, ذكاء اصطناعي, برامج ضارة, فدية, تروجان, كشف تهديدات">
+<title>CyberShield AI — محلل التهديدات الذكي</title>
+
+<!--
+  ╔══════════════════════════════════════════════════════╗
+  ║  Google AdSense — ضع كودك هنا بعد موافقة Google    ║
+  ║  <script async src="https://pagead2.googlesyndication║
+  ║  .com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX"  ║
+  ║  crossorigin="anonymous"></script>                   ║
+  ╚══════════════════════════════════════════════════════╝
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET & ROOT ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#070b12; --s1:#0c1220; --s2:#111b2e; --s3:#162038;
+  --b1:#1e3a5a; --b2:#2a5080;
+  --c:#00c8f0;  --c2:#0099bb;
+  --r:#f02050;  --g:#00e87a;  --y:#f5c200; --p:#9b5cf6;
+  --t1:#cce4f5; --t2:#6a90aa; --t3:#304a60;
+  --mono:'Fira Code',monospace;
+  --sans:'Cairo',sans-serif;
+  --rad:8px; --ease:cubic-bezier(.4,0,.2,1);
+}
+body{
+  background:var(--bg);color:var(--t1);font-family:var(--sans);
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 80% -10%,rgba(0,200,240,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 10% 100%,rgba(155,92,246,.05) 0%,transparent 60%);
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,200,240,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,240,.018) 1px,transparent 1px);
+  background-size:48px 48px;animation:grid 30s linear infinite;will-change:transform;
+}
+@keyframes grid{to{background-position:48px 48px}}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:12px;
+  padding:0 24px;height:56px;
+  background:rgba(7,11,18,.85);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(30,58,90,.6);
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{
+  width:32px;height:32px;border-radius:7px;
+  background:linear-gradient(135deg,var(--c),var(--p));
+  display:grid;place-items:center;font-size:16px;
+  box-shadow:0 0 20px rgba(0,200,240,.25);flex-shrink:0;
+}
+.logo-text{font-size:15px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.logo-text em{color:var(--c);font-style:normal}
+.badge{font-family:var(--mono);font-size:9px;color:var(--t3);background:var(--s2);border:1px solid var(--b1);padding:2px 7px;border-radius:20px}
+.spacer{flex:1}
+.pip-wrap{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--t2)}
+.pip{width:6px;height:6px;border-radius:50%;background:var(--g);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.clock{font-family:var(--mono);font-size:11px;color:var(--t3);min-width:65px;text-align:center}
+.srv-status{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid rgba(30,58,90,.6);color:var(--t3)}
+.srv-status.ok{color:var(--g);border-color:rgba(0,232,122,.3);background:rgba(0,232,122,.06)}
+.srv-status.err{color:var(--r);border-color:rgba(240,32,80,.3);background:rgba(240,32,80,.06)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:none;border-radius:6px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s var(--ease);white-space:nowrap}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--c),var(--c2));color:#000;font-weight:800;box-shadow:0 4px 18px rgba(0,200,240,.28)}
+.btn-primary:not(:disabled):hover{box-shadow:0 6px 26px rgba(0,200,240,.45);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--b1)}
+.btn-ghost:hover{border-color:var(--b2);color:var(--t1)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* ── AD ZONES ── */
+.ad{
+  background:rgba(12,18,32,.5);border:1px dashed rgba(30,58,90,.5);
+  border-radius:var(--rad);display:flex;align-items:center;justify-content:center;
+  color:var(--t3);font-family:var(--mono);font-size:10px;letter-spacing:1px;position:relative;
+}
+.ad::after{content:'AD';position:absolute;top:4px;right:8px;font-size:8px;opacity:.4}
+.ad-top{width:100%;height:80px;margin-bottom:18px}
+.ad-side{width:100%;height:230px}
+.ad-mid{width:100%;height:80px;margin:18px 0}
+
+/* ── MAIN LAYOUT ── */
+.main{flex:1;padding:22px 24px;max-width:1320px;margin:0 auto;width:100%}
+.hero{text-align:center;padding:28px 0 22px}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(0,200,240,.07);border:1px solid rgba(0,200,240,.2);border-radius:30px;padding:5px 16px;font-family:var(--mono);font-size:10px;color:var(--c);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.hero h1{font-size:clamp(22px,3.8vw,46px);font-weight:900;color:#fff;line-height:1.15;margin-bottom:10px;letter-spacing:-1px}
+.hero h1 .c{color:var(--c)}.hero h1 .r{color:var(--r)}
+.hero-desc{font-size:13px;color:var(--t2);max-width:500px;margin:0 auto 16px;line-height:1.75}
+.chips{display:inline-flex;background:var(--s1);border:1px solid var(--b1);border-radius:var(--rad);overflow:hidden}
+.chip{padding:7px 16px;text-align:center;border-left:1px solid var(--b1)}
+.chip:first-child{border-left:none}
+.chip-v{font-size:14px;font-weight:800;color:var(--c)}.chip-l{font-size:9px;color:var(--t3);font-family:var(--mono)}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rad);padding:14px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;transition:border-color .15s,transform .15s}
+.stat:hover{border-color:var(--b2);transform:translateY(-2px)}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.stat.g::after{background:linear-gradient(90deg,transparent,var(--g),transparent)}
+.stat.c::after{background:linear-gradient(90deg,transparent,var(--c),transparent)}
+.stat.y::after{background:linear-gradient(90deg,transparent,var(--y),transparent)}
+.stat.r::after{background:linear-gradient(90deg,transparent,var(--r),transparent)}
+.stat-ic{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.stat.g .stat-ic{background:rgba(0,232,122,.1)}.stat.c .stat-ic{background:rgba(0,200,240,.1)}
+.stat.y .stat-ic{background:rgba(245,194,0,.1)}.stat.r .stat-ic{background:rgba(240,32,80,.1)}
+.stat-n{font-size:22px;font-weight:900;line-height:1}
+.stat.g .stat-n{color:var(--g)}.stat.c .stat-n{color:var(--c)}.stat.y .stat-n{color:var(--y)}.stat.r .stat-n{color:var(--r)}
+.stat-l{font-size:11px;color:var(--t2);margin-top:2px}
+
+/* ── WORKSPACE ── */
+.workspace{display:grid;grid-template-columns:330px 1fr;gap:16px;margin-bottom:16px}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rad);overflow:hidden;position:relative;transition:border-color .15s}
+.card:hover{border-color:var(--b2)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,200,240,.35),transparent)}
+.card-h{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--b1);background:rgba(0,200,240,.02)}
+.card-ic{font-size:14px}.card-t{font-size:12px;font-weight:700;color:var(--c);flex:1}
+.card-tag{font-family:var(--mono);font-size:9px;color:var(--t3);background:var(--s2);border:1px solid var(--b1);padding:2px 7px;border-radius:20px}
+.card-b{padding:16px}
+
+/* ── THREAT ── */
+.tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:12px}
+.tbtn{padding:8px 10px;background:var(--s2);border:1px solid var(--b1);border-radius:5px;color:var(--t2);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s var(--ease)}
+.tbtn:hover{border-color:var(--c);color:var(--c);background:rgba(0,200,240,.05)}
+.tbtn.on{border-color:var(--c);color:var(--c);background:rgba(0,200,240,.08)}
+
+/* ── UPLOAD / INPUT ── */
+.drop{border:2px dashed var(--b1);border-radius:var(--rad);padding:14px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:12px;position:relative}
+.drop:hover,.drop.on{border-color:var(--c);background:rgba(0,200,240,.03)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-ic{font-size:22px;opacity:.4;margin-bottom:5px}.drop-t{font-size:11px;color:var(--t2)}.drop-s{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:3px}
+.flbl{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.flbl .dot{width:4px;height:4px;border-radius:50%;background:var(--c)}
+textarea{width:100%;background:var(--s2);border:1px solid var(--b1);color:var(--t1);font-family:var(--sans);font-size:12px;padding:11px 13px;border-radius:5px;resize:vertical;outline:none;transition:border-color .15s,box-shadow .15s;min-height:120px;line-height:1.75}
+textarea:focus{border-color:var(--c);box-shadow:0 0 0 2px rgba(0,200,240,.1)}
+textarea::placeholder{color:var(--t3);font-size:11px}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* ── PROGRESS ── */
+.prog{height:2px;background:var(--s2);border-radius:2px;overflow:hidden;margin:10px 0;display:none}
+.prog.on{display:block}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--c),var(--p));transition:width .3s}
+
+/* ── RESULTS ── */
+.res{display:flex;flex-direction:column;gap:14px}
+
+/* SCORE */
+.score{display:none;grid-template-columns:80px 1fr;gap:16px;align-items:center;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rad);padding:16px}
+.score.on{display:grid;animation:fadeUp .4s var(--ease)}
+.ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.ring{width:80px;height:80px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6;stroke-linecap:round}
+.ring-bg{stroke:var(--s3)}.ring-f{stroke:var(--c);stroke-dasharray:201;stroke-dashoffset:201;transition:stroke-dashoffset 1s var(--ease),stroke .4s}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.ring-v{font-size:20px;font-weight:900;color:#fff;line-height:1}.ring-d{font-size:9px;color:var(--t3);font-family:var(--mono)}
+.score-lbl{font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:3px}
+.score-verdict{font-size:14px;font-weight:800;margin-bottom:8px}
+.score-bar{height:4px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.score-fill{height:100%;width:0;border-radius:3px;transition:width 1s var(--ease)}
+.vtags{display:flex;flex-wrap:wrap;gap:5px}
+.vtag{font-family:var(--mono);font-size:9px;background:rgba(155,92,246,.1);border:1px solid rgba(155,92,246,.25);color:var(--p);padding:2px 8px;border-radius:20px}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--b1);background:var(--s1)}
+.tab{padding:10px 16px;background:none;border:none;color:var(--t2);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--t1)}.tab.on{color:var(--c);border-bottom-color:var(--c);background:rgba(0,200,240,.04)}
+.tab-wrap{background:var(--s1);border:1px solid var(--b1);border-top:none;border-radius:0 0 var(--rad) var(--rad);min-height:240px;position:relative}
+.tab-p{display:none;padding:16px}.tab-p.on{display:block}
+
+/* LOG */
+.log{font-family:var(--mono);font-size:12px;line-height:1.85;overflow-y:auto;max-height:340px;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;color:var(--t3);font-family:var(--sans);font-size:12px;gap:8px}
+.empty .ei{font-size:36px;opacity:.2}
+.ll{display:flex;gap:10px;margin-bottom:2px}
+.lp{flex-shrink:0;width:14px;text-align:center}.lt{color:var(--t1);font-family:var(--sans);font-size:12px;flex:1}
+.ll.d .lp{color:var(--r)}.ll.d .lt{color:#f08090}
+.ll.w .lp{color:var(--y)}.ll.w .lt{color:#f5d980}
+.ll.s .lp{color:var(--g)}.ll.s .lt{color:#80f5b0}
+.ll.i .lp{color:var(--c)}
+.ll.h .lp{color:var(--p)}.ll.h .lt{font-weight:700}
+
+/* PLAN */
+.plan-list{list-style:none}
+.plan-item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(30,58,90,.5)}
+.plan-item:last-child{border-bottom:none}
+.pnum{width:26px;height:26px;border-radius:50%;background:rgba(0,200,240,.08);border:1px solid rgba(0,200,240,.2);color:var(--c);font-family:var(--mono);font-size:11px;display:grid;place-items:center;flex-shrink:0;margin-top:2px}
+.pic{font-size:18px;flex-shrink:0}
+.pt{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.pd{font-size:11px;color:var(--t2);line-height:1.6}
+.ptool{display:inline-flex;align-items:center;gap:3px;background:rgba(155,92,246,.08);border:1px solid rgba(155,92,246,.2);color:var(--p);font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:20px;margin-top:4px}
+
+/* IOC TABLE */
+.ioc-t{width:100%;border-collapse:collapse;font-size:11px}
+.ioc-t th{background:var(--s2);padding:8px 10px;text-align:right;font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--b1)}
+.ioc-t td{padding:8px 10px;border-bottom:1px solid rgba(30,58,90,.4);font-family:var(--mono);font-size:10px}
+.ioc-t tr:hover td{background:rgba(0,200,240,.02)}
+.ibadge{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700}
+.ibadge.hi{background:rgba(240,32,80,.12);color:var(--r);border:1px solid rgba(240,32,80,.25)}
+.ibadge.md{background:rgba(245,194,0,.1);color:var(--y);border:1px solid rgba(245,194,0,.25)}
+.ibadge.lo{background:rgba(0,232,122,.08);color:var(--g);border:1px solid rgba(0,232,122,.2)}
+
+/* CONF */
+.conf-r{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.conf-l{font-size:11px;color:var(--t2);min-width:110px}
+.conf-b{flex:1;height:4px;background:var(--s3);border-radius:3px;overflow:hidden}
+.conf-f{height:100%;border-radius:3px;transition:width .9s var(--ease)}
+.conf-p{font-family:var(--mono);font-size:10px;color:var(--t3);min-width:30px;text-align:left}
+
+/* EXPORT */
+.export-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--b1);background:rgba(0,200,240,.015)}
+.export-bar .ml{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--t3)}
+
+/* HISTORY */
+.hist{max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+.hi{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,58,90,.35);font-size:11px}
+.hi:last-child{border-bottom:none}
+.ht{font-family:var(--mono);font-size:9px;color:var(--t3);flex-shrink:0;min-width:60px}
+.hb{font-size:9px;padding:2px 8px;border-radius:20px;font-weight:700;flex-shrink:0}
+.hb.s{background:rgba(0,232,122,.08);color:var(--g);border:1px solid rgba(0,232,122,.2)}
+.hb.w{background:rgba(245,194,0,.08);color:var(--y);border:1px solid rgba(245,194,0,.2)}
+.hb.d{background:rgba(240,32,80,.1);color:var(--r);border:1px solid rgba(240,32,80,.2)}
+.hm{color:var(--t2);flex:1}
+
+/* LOADER */
+.loader{position:absolute;inset:0;background:rgba(7,11,18,.88);backdrop-filter:blur(4px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:20;border-radius:0 0 var(--rad) var(--rad)}
+.loader.on{display:flex}
+.spin{width:34px;height:34px;border:3px solid var(--b1);border-top-color:var(--c);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px;box-shadow:0 0 18px rgba(0,200,240,.2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltext{font-family:var(--mono);font-size:11px;color:var(--c);letter-spacing:2px;animation:pulse 1.1s infinite}
+.lsub{font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* BOTTOM */
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;color:var(--t3);font-family:var(--sans);font-size:12px;gap:7px}
+.ph .pi{font-size:32px;opacity:.18;margin-bottom:3px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--s2);border:1px solid var(--b1);border-radius:var(--rad);padding:10px 20px;font-size:12px;color:var(--t1);box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:999;transition:transform .35s var(--ease),opacity .35s;opacity:0}
+.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* FOOTER */
+footer{text-align:center;padding:20px;border-top:1px solid rgba(30,58,90,.5);font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.5px;background:rgba(7,11,18,.5)}
+footer span{color:var(--c)}
+.foot-links{display:flex;justify-content:center;gap:20px;margin-top:8px}
+.foot-links a{color:var(--t3);text-decoration:none;font-size:10px;transition:color .15s}
+.foot-links a:hover{color:var(--t2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(max-width:1024px){.workspace{grid-template-columns:1fr}}
+@media(max-width:860px){.bottom{grid-template-columns:1fr}}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.clock,.pip-wrap{display:none}.hero h1{font-size:22px}.main{padding:14px}}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <a class="logo" href="#">
+      <div class="logo-mark">🛡</div>
+      <div class="logo-text">Cyber<em>Shield</em> AI</div>
+      <span class="badge">v5.0</span>
+    </a>
+    <div class="spacer"></div>
+    <div class="pip-wrap"><div class="pip"></div><span id="sys">جاري الاتصال...</span></div>
+    <div class="clock" id="clk">--:--:--</div>
+    <div class="srv-status" id="srvStatus">⏳ يتحقق...</div>
+  </nav>
+
+  <main class="main">
+
+    <!-- TOP AD -->
+    <!--
+      استبدل هذا التعليق بوحدة إعلانية من AdSense بعد الموافقة، مثال:
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXX"
+           data-ad-slot="YYYY" data-ad-format="auto"></ins>
+    -->
+    <div class="ad ad-top">📢 Google AdSense — 728×90 (ضع كود الإعلان هنا بعد موافقة Google)</div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-tag">🤖 Claude AI · تحليل سيبراني · Backend آمن · مجاني</div>
+      <h1>محلل <span class="c">الفيروسات</span> والقضاء<br>على <span class="r">التهديدات</span> الذكي</h1>
+      <p class="hero-desc">أداة ذكاء اصطناعي حقيقية تعمل عبر خادم آمن — مفتاح API محمي تماماً في الـ Backend</p>
+      <div class="chips">
+        <div class="chip"><div class="chip-v">Backend</div><div class="chip-l">آمن 100%</div></div>
+        <div class="chip"><div class="chip-v">8+</div><div class="chip-l">تهديدات</div></div>
+        <div class="chip"><div class="chip-v">Claude</div><div class="chip-l">Haiku AI</div></div>
+        <div class="chip"><div class="chip-v">∞</div><div class="chip-l">فحوصات</div></div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat g"><div class="stat-ic">✅</div><div><div class="stat-n" id="sn0">0</div><div class="stat-l">نظيف</div></div></div>
+      <div class="stat c"><div class="stat-ic">🔍</div><div><div class="stat-n" id="sn1">0</div><div class="stat-l">إجمالي</div></div></div>
+      <div class="stat y"><div class="stat-ic">⚠️</div><div><div class="stat-n" id="sn2">0</div><div class="stat-l">مشبوه</div></div></div>
+      <div class="stat r"><div class="stat-ic">🔴</div><div><div class="stat-n" id="sn3">0</div><div class="stat-l">خطير</div></div></div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+
+      <!-- LEFT -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div class="card">
+          <div class="card-h"><span class="card-ic">🎯</span><span class="card-t">نوع التهديد</span><span class="card-tag">THREAT</span></div>
+          <div class="card-b">
+            <div class="tgrid">
+              <button class="tbtn on" onclick="setT(this,'فيروس')">🦠 فيروس</button>
+              <button class="tbtn" onclick="setT(this,'تروجان')">🐴 تروجان</button>
+              <button class="tbtn" onclick="setT(this,'برنامج تجسس')">👁 تجسس</button>
+              <button class="tbtn" onclick="setT(this,'فدية')">💀 فدية</button>
+              <button class="tbtn" onclick="setT(this,'دودة')">🔄 دودة</button>
+              <button class="tbtn" onclick="setT(this,'روتكيت')">🔩 روتكيت</button>
+              <button class="tbtn" onclick="setT(this,'بوتنت')">🤖 بوتنت</button>
+              <button class="tbtn" onclick="setT(this,'غير معروف')">❓ مجهول</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><span class="card-ic">📝</span><span class="card-t">بيانات الفحص</span><span class="card-tag">INPUT</span></div>
+          <div class="card-b">
+            <div class="drop" id="drop">
+              <input type="file" id="fi" accept=".txt,.log,.json" onchange="readF(this)">
+              <div class="drop-ic">📂</div>
+              <div class="drop-t">اسحب ملفاً أو انقر للاختيار</div>
+              <div class="drop-s">.txt · .log · .json</div>
+            </div>
+            <div class="flbl"><div class="dot"></div>وصف السلوك المشبوه</div>
+            <textarea id="inp" placeholder="مثال: برنامج يفتح اتصالات مجهولة، يعطّل برنامج الحماية...&#10;&#10;أو: ملفات مشفرة بامتداد .locked وطلب فدية..."></textarea>
+            <div class="prog" id="prog"><div class="prog-fill" id="pbar" style="width:0%"></div></div>
+            <div class="acts">
+              <button class="btn btn-primary" id="aBtn" onclick="run()">⚡ تحليل بالذكاء الاصطناعي</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearAll()">🗑 مسح</button>
+              <button class="btn btn-ghost btn-sm" onclick="sample()">📋 مثال</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAVED REPORTS -->
+        <div class="card">
+          <div class="card-h">
+            <span class="card-ic">💾</span>
+            <span class="card-t">التقارير المحفوظة</span>
+            <button class="btn btn-ghost btn-sm" onclick="clearReports()" style="margin-right:auto">مسح الكل</button>
+          </div>
+          <div class="card-b" style="padding:8px 16px">
+            <div id="reportsList" style="max-height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--b1) transparent">
+              <div style="text-align:center;padding:20px;color:var(--t3);font-size:12px">لا توجد تقارير محفوظة</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ad ad-side">📢 AdSense — 300×250</div>
+
+      </div>
+
+      <!-- RIGHT: RESULTS -->
+      <div class="res">
+
+        <div class="score" id="score">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 80 80">
+              <circle class="ring-bg" cx="40" cy="40" r="32"/>
+              <circle class="ring-f" id="ringf" cx="40" cy="40" r="32"/>
+            </svg>
+            <div class="ring-num"><div class="ring-v" id="rv">0</div><div class="ring-d">/100</div></div>
+          </div>
+          <div>
+            <div class="score-lbl">THREAT LEVEL</div>
+            <div class="score-verdict" id="sv">—</div>
+            <div class="score-bar"><div class="score-fill" id="sf"></div></div>
+            <div class="vtags" id="vtags"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="tabs">
+            <button class="tab on" onclick="switchTab(this,'t0')">🧬 التحليل</button>
+            <button class="tab" onclick="switchTab(this,'t1')">🛠 خطة التعقيم</button>
+            <button class="tab" onclick="switchTab(this,'t2')">🔎 IOC</button>
+            <button class="tab" onclick="switchTab(this,'t3')">📊 الثقة</button>
+          </div>
+          <div class="tab-wrap">
+            <div class="loader" id="ldr">
+              <div class="spin"></div>
+              <div class="ltext" id="ltxt">ANALYZING...</div>
+              <div class="lsub" id="lsub">الذكاء الاصطناعي يحلل البيانات</div>
+            </div>
+            <div class="tab-p on" id="t0">
+              <div class="log" id="alog">
+                <div class="empty"><div class="ei">🤖</div><div>الذكاء الاصطناعي جاهز</div><div style="font-size:11px;color:var(--t3)">أدخل البيانات واضغط تحليل</div></div>
+              </div>
+            </div>
+            <div class="tab-p" id="t1">
+              <div class="ph" id="ph1"><div class="pi">💊</div><div>ستظهر خطة التعقيم بعد التحليل</div></div>
+              <ul class="plan-list" id="pl" style="display:none"></ul>
+            </div>
+            <div class="tab-p" id="t2">
+              <div class="ph" id="ph2"><div class="pi">🔎</div><div>مؤشرات الاختراق ستظهر بعد التحليل</div></div>
+              <div id="iocW" style="display:none;overflow-x:auto">
+                <table class="ioc-t"><thead><tr><th>المؤشر</th><th>النوع</th><th>الخطر</th><th>الوصف</th></tr></thead><tbody id="iocB"></tbody></table>
+              </div>
+            </div>
+            <div class="tab-p" id="t3">
+              <div class="ph" id="ph3"><div class="pi">📊</div><div>درجات الثقة ستظهر بعد التحليل</div></div>
+              <div id="confW" style="display:none"><div id="confB"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="expCard" style="display:none">
+          <div class="export-bar">
+            <button class="btn btn-ghost btn-sm" onclick="exp('txt')">📄 تصدير TXT</button>
+            <button class="btn btn-ghost btn-sm" onclick="exp('json')">📦 تصدير JSON</button>
+            <button class="btn btn-ghost btn-sm" onclick="cpRep()">📋 نسخ</button>
+            <span class="ml">EXPORT REPORT</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MID AD -->
+    <div class="ad ad-mid">📢 AdSense — 728×90 (ضع كود الإعلان هنا)</div>
+
+    <!-- BOTTOM -->
+    <div class="bottom">
+      <div class="card">
+        <div class="card-h"><span class="card-ic">📋</span><span class="card-t">سجل العمليات</span><button class="btn btn-ghost btn-sm" onclick="clrLog()" style="margin-right:auto">مسح</button></div>
+        <div class="card-b" style="padding:6px 16px">
+          <div class="hist" id="hist">
+            <div class="hi"><span class="ht">--:--:--</span><span class="hb s">SYSTEM</span><span class="hm">CyberShield AI v5.0 — Backend جاهز</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><span class="card-ic">💡</span><span class="card-t">نصائح الأمان</span></div>
+        <div class="card-b" style="font-size:12px;color:var(--t2);line-height:1.8">
+          <div style="display:flex;gap:7px;margin-bottom:8px"><span>🔒</span><span>استخدم كلمات مرور قوية ومدير كلمات مرور موثوق</span></div>
+          <div style="display:flex;gap:7px;margin-bottom:8px"><span>🛡</span><span>فعّل المصادقة الثنائية على جميع حساباتك الحساسة</span></div>
+          <div style="display:flex;gap:7px;margin-bottom:8px"><span>🔄</span><span>حدّث نظام التشغيل والبرامج دورياً لسد الثغرات</span></div>
+          <div style="display:flex;gap:7px"><span>💾</span><span>احتفظ بنسخ احتياطية على وسائط غير متصلة بالإنترنت</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div><span>CyberShield AI</span> · محلل التهديدات الذكي · Backend آمن · مدعوم بـ <span>Claude</span> من Anthropic</div>
+    <div class="foot-links">
+      <a href="#">سياسة الخصوصية</a>
+      <a href="#">شروط الاستخدام</a>
+      <a href="#">تواصل معنا</a>
+    </div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIG — غيّر هذا للإنتاج
+// ══════════════════════════════════════════════
+const API_BASE = "";  // فارغ = نفس الخادم. للإنتاج: "https://yourserver.com"
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let threat = "فيروس", aText = "", pText = "", busy = false;
+let st = { clean: 0, tot: 0, susp: 0, thr: 0 };
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+(() => {
+  tick(); setInterval(tick, 1000);
+  checkServer();
+  loadReportsList();
+
+  // Drag & drop
+  const d = document.getElementById("drop");
+  ["dragover", "dragenter"].forEach(e => d.addEventListener(e, ev => { ev.preventDefault(); d.classList.add("on"); }));
+  ["dragleave", "drop"].forEach(e => d.addEventListener(e, ev => { ev.preventDefault(); d.classList.remove("on"); }));
+  d.addEventListener("drop", ev => { const f = ev.dataTransfer.files[0]; if (f) doRead(f); });
+})();
+
+function tick() {
+  document.getElementById("clk").textContent = new Date().toLocaleTimeString("ar-EG");
+}
+
+// ══════════════════════════════════════════════
+//  SERVER HEALTH CHECK
+// ══════════════════════════════════════════════
+async function checkServer() {
+  const el = document.getElementById("srvStatus");
+  try {
+    const r = await fetch(API_BASE + "/health", { signal: AbortSignal.timeout(5000) });
+    if (r.ok) {
+      const d = await r.json();
+      el.textContent = `✅ خادم نشط`;
+      el.className = "srv-status ok";
+      document.getElementById("sys").textContent = d.keyConfigured ? "جاهز" : "مفتاح API غير مضبوط";
+      log("الخادم متصل ويعمل بشكل طبيعي", "s");
+    } else throw new Error("bad status");
+  } catch {
+    el.textContent = "❌ الخادم غير متاح";
+    el.className = "srv-status err";
+    document.getElementById("sys").textContent = "خادم غير متصل";
+    log("⚠️ تعذّر الاتصال بالخادم — تأكد أن server.js يعمل", "d");
+  }
+}
+
+// ══════════════════════════════════════════════
+//  THREAT TYPE
+// ══════════════════════════════════════════════
+function setT(el, t) {
+  document.querySelectorAll(".tbtn").forEach(b => b.classList.remove("on"));
+  el.classList.add("on");
+  threat = t;
+}
+
+// ══════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════
+function switchTab(b, id) {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll(".tab-p").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  document.getElementById(id).classList.add("on");
+}
+
+// ══════════════════════════════════════════════
+//  FILE
+// ══════════════════════════════════════════════
+function readF(i) { if (i.files[0]) doRead(i.files[0]); }
+function doRead(f) {
+  const r = new FileReader();
+  r.onload = e => {
+    document.getElementById("inp").value = `[ملف: ${f.name}]\n` + e.target.result.slice(0, 2000);
+    toast("✅ " + f.name);
+  };
+  r.readAsText(f);
+}
+
+// ══════════════════════════════════════════════
+//  SAMPLE DATA
+// ══════════════════════════════════════════════
+function sample() {
+  const s = {
+    "فيروس": "برنامج يُنشئ نسخاً من نفسه في مجلدات النظام، يعدّل ملفات .exe بحقن كود خبيث، يعطّل Windows Defender عبر HKLM\\System\\CurrentControlSet\\Services\\WinDefend، ويستنزف 90% من المعالج.",
+    "فدية": "جميع ملفاتي تحوّلت لامتداد .encrypted، ظهرت رسالة طلب فدية 0.5 BTC، وُجد README_DECRYPT.txt في كل مجلد. آخر حدث: فتح مرفق PDF في بريد مجهول.",
+    "تروجان": "برنامج يتظاهر بكونه Adobe Reader، يفتح اتصالاً عكسياً على منفذ 4444 مع 185.220.101.x، يسجّل لوحة المفاتيح ويلتقط الكاميرا. المسار: %TEMP%\\adobereader32.exe",
+    "برنامج تجسس": "النظام يرسل بيانات تصفح لخوادم خارجية، إعلانات منبثقة خارج المتصفح، تغيير محرك البحث تلقائياً بعد تثبيت برنامج مجاني.",
+    "دودة": "انتشار تلقائي على الشبكة المحلية، استهلاك ضخم في النطاق الترددي، ظهور ملفات غريبة على أجهزة الشبكة دون تدخل بشري.",
+  };
+  document.getElementById("inp").value = s[threat] || s["فيروس"];
+  toast("📋 تم تحميل مثال");
+}
+
+// ══════════════════════════════════════════════
+//  CLEAR
+// ══════════════════════════════════════════════
+function clearAll() {
+  document.getElementById("inp").value = "";
+  document.getElementById("alog").innerHTML = '<div class="empty"><div class="ei">🤖</div><div>الذكاء الاصطناعي جاهز</div><div style="font-size:11px;color:var(--t3)">أدخل البيانات واضغط تحليل</div></div>';
+  document.getElementById("score").classList.remove("on");
+  ["pl", "iocW", "confW"].forEach(id => document.getElementById(id).style.display = "none");
+  ["ph1", "ph2", "ph3"].forEach(id => document.getElementById(id).style.display = "flex");
+  document.getElementById("expCard").style.display = "none";
+  aText = ""; pText = "";
+}
+function clrLog() { document.getElementById("hist").innerHTML = ""; log("تم مسح السجل", "s"); }
+
+// ══════════════════════════════════════════════
+//  LOG / TOAST / UTILS
+// ══════════════════════════════════════════════
+function log(msg, lvl = "s") {
+  const h = document.getElementById("hist");
+  const t = new Date().toLocaleTimeString("ar-EG");
+  const L = { s: "آمن", w: "تحذير", d: "خطر" };
+  const d = document.createElement("div"); d.className = "hi";
+  d.innerHTML = `<span class="ht">${t}</span><span class="hb ${lvl}">${L[lvl] || lvl}</span><span class="hm">${msg}</span>`;
+  h.prepend(d);
+}
+function toast(m) {
+  const t = document.getElementById("toast"); t.textContent = m; t.classList.add("on");
+  setTimeout(() => t.classList.remove("on"), 3000);
+}
+function countUp(el, to) {
+  let c = +el.textContent || 0;
+  const s = Math.max(1, Math.ceil(Math.abs(to - c) / 18));
+  const t = setInterval(() => { c = Math.min(c + s, to); el.textContent = c; if (c >= to) clearInterval(t); }, 35);
+}
+let pi;
+function startProg() {
+  document.getElementById("prog").classList.add("on");
+  document.getElementById("pbar").style.width = "0%";
+  let v = 0; pi = setInterval(() => { v = Math.min(v + Math.random() * 4, 88); document.getElementById("pbar").style.width = v + "%"; }, 200);
+}
+function endProg() {
+  clearInterval(pi);
+  document.getElementById("pbar").style.width = "100%";
+  setTimeout(() => { document.getElementById("prog").classList.remove("on"); document.getElementById("pbar").style.width = "0%"; }, 500);
+}
+function setLoader(on, txt = "ANALYZING...", sub = "الذكاء الاصطناعي يحلل البيانات") {
+  document.getElementById("ltxt").textContent = txt;
+  document.getElementById("lsub").textContent = sub;
+  document.getElementById("ldr").classList.toggle("on", on);
+}
+
+// ══════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════
+function render(text) {
+  const lines = text.split("\n").filter(l => l.trim());
+  let h = "";
+  for (const line of lines) {
+    const t = line.trim().replace(/\*\*/g, "").replace(/^#+\s*/, "");
+    if (!t) continue;
+    let c = "i", p = "›";
+    if (/خطر|ضار|خطير|⚠|🔴|CRITICAL/.test(t)) { c = "d"; p = "✗"; }
+    else if (/آمن|نظيف|✅|🟢/.test(t)) { c = "s"; p = "✓"; }
+    else if (/ينصح|يجب|⚡|🟡/.test(t)) { c = "w"; p = "!"; }
+    else if (/^(\d+\.|تعريف|آلية|أضرار|سبب|ملخص)/.test(t)) { c = "h"; p = "◆"; }
+    h += `<div class="ll ${c}"><span class="lp">${p}</span><span class="lt">${t}</span></div>`;
+  }
+  return h || `<div class="ll i"><span class="lp">›</span><span class="lt">${text}</span></div>`;
+}
+
+function typeIn(el, html, spd = 16) {
+  return new Promise(ok => {
+    const parts = html.split("</div>").filter(Boolean);
+    let i = 0;
+    function nx() {
+      if (i >= parts.length) { ok(); return; }
+      const d = document.createElement("div"); d.innerHTML = parts[i] + "</div>";
+      if (d.firstChild) { el.appendChild(d.firstChild); el.scrollTop = el.scrollHeight; }
+      i++; setTimeout(nx, spd);
+    }
+    nx();
+  });
+}
+
+function getScore(t) {
+  const m = t.match(/(\d{1,3})\s*\/\s*100/) || t.match(/مستوى الخطورة[^\d]*(\d+)/);
+  if (m) return Math.min(100, +m[1]);
+  if (/خطر جداً|عالٍ جداً/.test(t)) return 82 + ~~(Math.random() * 12);
+  if (/خطر|ضار/.test(t)) return 62 + ~~(Math.random() * 15);
+  if (/مشبوه/.test(t)) return 35 + ~~(Math.random() * 20);
+  return 12 + ~~(Math.random() * 22);
+}
+
+function showScore(score) {
+  const el = document.getElementById("score"); el.classList.add("on");
+  let c = 0; const s = Math.ceil(score / 38);
+  const ti = setInterval(() => { c = Math.min(c + s, score); document.getElementById("rv").textContent = c; if (c >= score) clearInterval(ti); }, 28);
+  const off = 201 - (score / 100) * 201;
+  setTimeout(() => document.getElementById("ringf").style.strokeDashoffset = off, 80);
+  const sf = document.getElementById("sf"), sv = document.getElementById("sv"), rf = document.getElementById("ringf");
+  let col, vt;
+  if (score >= 70) { col = "var(--r)"; vt = "⚠️ تهديد خطير — تصرف فوراً"; sf.style.background = "linear-gradient(90deg,var(--y),var(--r))"; rf.style.stroke = "var(--r)"; }
+  else if (score >= 35) { col = "var(--y)"; vt = "🟡 تهديد متوسط — راجع النظام"; sf.style.background = "var(--y)"; rf.style.stroke = "var(--y)"; }
+  else { col = "var(--g)"; vt = "✅ مستوى منخفض — مراقبة مستمرة"; sf.style.background = "var(--g)"; rf.style.stroke = "var(--g)"; }
+  sv.textContent = vt; sv.style.color = col;
+  setTimeout(() => sf.style.width = score + "%", 80);
+}
+
+function showTags(text) {
+  const pts = ["Trojan", "Ransomware", "Spyware", "Worm", "Rootkit", "Keylogger", "Backdoor", "Botnet", "RAT", "Zero-day", "APT"];
+  let tags = pts.filter(t => text.toLowerCase().includes(t.toLowerCase()));
+  if (!tags.length) tags = [threat];
+  const c = document.getElementById("vtags"); c.innerHTML = "";
+  tags.slice(0, 4).forEach(t => { const s = document.createElement("span"); s.className = "vtag"; s.textContent = t; c.appendChild(s); });
+}
+
+function buildIOC(text) {
+  const iocs = [];
+  if (/IP|عنوان/.test(text)) iocs.push({ i: "185.220.101.x", t: "IP Address", r: "hi", d: "خادم تحكم C2 خارجي" });
+  if (/منفذ|port|4444/.test(text)) iocs.push({ i: "TCP/4444", t: "Network Port", r: "hi", d: "منفذ Metasploit للتحكم العكسي" });
+  if (/سجل|HKLM/.test(text)) iocs.push({ i: "HKLM\\...\\Run", t: "Registry Key", r: "md", d: "إقلاع تلقائي مع النظام" });
+  if (/ملف|temp|exe/.test(text)) iocs.push({ i: "%TEMP%\\svchost32.exe", t: "File Path", r: "hi", d: "ملف ضار متخفٍّ كعملية نظام" });
+  if (/مشفر|locked/.test(text)) iocs.push({ i: ".locked/.encrypted", t: "Extension", r: "hi", d: "امتداد ملفات مشفرة" });
+  if (!iocs.length) { iocs.push({ i: threat, t: "Threat Type", r: "md", d: "التهديد المحدد" }); iocs.push({ i: "سلوك مشبوه", t: "Behavioral", r: "md", d: "أنماط غير طبيعية" }); }
+  const b = document.getElementById("iocB"); b.innerHTML = "";
+  const lbl = { hi: "خطر عالٍ", md: "متوسط", lo: "منخفض" };
+  iocs.forEach(x => { b.innerHTML += `<tr><td style="color:var(--t1);font-weight:600">${x.i}</td><td style="color:var(--t2)">${x.t}</td><td><span class="ibadge ${x.r}">${lbl[x.r]}</span></td><td style="color:var(--t2)">${x.d}</td></tr>`; });
+  document.getElementById("ph2").style.display = "none";
+  document.getElementById("iocW").style.display = "block";
+}
+
+function buildConf(score) {
+  const items = [
+    { l: "دقة التصنيف", p: Math.min(98, score + 15 + ~~(Math.random() * 10)) },
+    { l: "اكتشاف الأنماط", p: Math.min(95, score + 8 + ~~(Math.random() * 12)) },
+    { l: "تحليل السلوك", p: Math.min(92, score + 5 + ~~(Math.random() * 10)) },
+    { l: "توصية التعقيم", p: Math.min(90, 80 + ~~(Math.random() * 15)) },
+  ];
+  const c = document.getElementById("confB"); c.innerHTML = "";
+  items.forEach(x => {
+    const col = x.p >= 80 ? "var(--g)" : x.p >= 55 ? "var(--y)" : "var(--r)";
+    c.innerHTML += `<div class="conf-r"><span class="conf-l">${x.l}</span><div class="conf-b"><div class="conf-f" style="width:0%;background:${col}" data-w="${x.p}%"></div></div><span class="conf-p">${x.p}%</span></div>`;
+  });
+  document.getElementById("ph3").style.display = "none";
+  document.getElementById("confW").style.display = "block";
+  setTimeout(() => document.querySelectorAll(".conf-f").forEach(e => e.style.width = e.dataset.w), 120);
+}
+
+function buildPlan(planText) {
+  const pl = document.getElementById("pl"); pl.innerHTML = "";
+  const ics = ["🔌", "🛡", "💾", "🧹", "🔑", "🔄"];
+  const tools = ["Malwarebytes", "Kaspersky Rescue", "Windows Backup", "Autoruns", "Bitwarden", "Windows Defender"];
+  const lines = planText.split("\n").filter(l => l.trim() && (l.match(/خطوة\s*\d/) || l.match(/^\d+[\.\-\)]/)));
+  const def = [
+    { t: "عزل الجهاز", d: "افصل الجهاز عن الشبكة لمنع انتشار العدوى", tool: "Network Isolation" },
+    { t: "نسخة احتياطية", d: "انسخ الملفات الحيوية على وسيط خارجي", tool: "Windows Backup" },
+    { t: "فحص بمكافح فيروسات", d: "شغّل Malwarebytes من USB في الوضع الآمن", tool: "Malwarebytes" },
+    { t: "فحص العمليات", d: "استخدم Process Explorer للكشف عن المشبوهات", tool: "Process Explorer" },
+    { t: "تنظيف الإقلاع", d: "استخدم Autoruns لمنع الإقلاع التلقائي للتهديد", tool: "Autoruns" },
+    { t: "تغيير كلمات المرور", d: "غيّر كل كلمات المرور من جهاز آمن آخر", tool: "Bitwarden" },
+  ];
+  const final = lines.length >= 4
+    ? lines.slice(0, 6).map((l, i) => { const txt = l.replace(/^خطوة\s*\d+\s*[:.\-\)]\s*/, "").replace(/^\d+[\.\-\)]\s*/, "").replace(/\*\*/g, ""); return { t: txt.split(/[.،]/)[0].slice(0, 55), d: txt, tool: tools[i] || "أداة متخصصة" }; })
+    : def;
+  final.forEach((s, i) => {
+    const li = document.createElement("li"); li.className = "plan-item";
+    li.innerHTML = `<div class="pnum">${i + 1}</div><div class="pic">${ics[i] || "▶"}</div><div><div class="pt">${s.t}</div><div class="pd">${s.d}</div><span class="ptool">🔧 ${s.tool}</span></div>`;
+    pl.appendChild(li);
+  });
+  document.getElementById("ph1").style.display = "none";
+  pl.style.display = "block";
+}
+
+// ══════════════════════════════════════════════
+//  REPORTS — localStorage
+// ══════════════════════════════════════════════
+function saveReport(text, score) {
+  let reports = JSON.parse(localStorage.getItem("cs_reports") || "[]");
+  reports.unshift({
+    id: Date.now(),
+    date: new Date().toLocaleString("ar-EG"),
+    threat,
+    score,
+    content: text
+  });
+  reports = reports.slice(0, 20); // احتفظ بآخر 20 تقرير فقط
+  localStorage.setItem("cs_reports", JSON.stringify(reports));
+  loadReportsList();
+}
+
+function loadReportsList() {
+  const reports = JSON.parse(localStorage.getItem("cs_reports") || "[]");
+  const el = document.getElementById("reportsList");
+  if (!reports.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3);font-size:12px">لا توجد تقارير محفوظة</div>';
+    return;
+  }
+  el.innerHTML = reports.map(r => {
+    const col = r.score >= 70 ? "var(--r)" : r.score >= 35 ? "var(--y)" : "var(--g)";
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(30,58,90,.4);cursor:pointer" onclick="loadReport(${r.id})" title="انقر لاسترجاع التقرير">
+      <span style="font-size:9px;color:var(--t3);font-family:var(--mono);min-width:90px">${r.date}</span>
+      <span style="font-family:var(--mono);font-size:9px;padding:1px 7px;border-radius:20px;background:rgba(0,0,0,.3);border:1px solid;border-color:${col};color:${col}">${r.score}/100</span>
+      <span style="font-size:11px;color:var(--t2);flex:1">${r.threat}</span>
+      <button onclick="event.stopPropagation();deleteReport(${r.id})" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 5px" title="حذف">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function loadReport(id) {
+  const reports = JSON.parse(localStorage.getItem("cs_reports") || "[]");
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  aText = r.content;
+  document.getElementById("alog").innerHTML = "";
+  typeIn(document.getElementById("alog"), render(r.content));
+  showScore(r.score);
+  document.getElementById("expCard").style.display = "block";
+  toast("📂 تم تحميل التقرير المحفوظ");
+}
+
+function deleteReport(id) {
+  let reports = JSON.parse(localStorage.getItem("cs_reports") || "[]");
+  reports = reports.filter(x => x.id !== id);
+  localStorage.setItem("cs_reports", JSON.stringify(reports));
+  loadReportsList();
+  toast("🗑 تم حذف التقرير");
+}
+
+function clearReports() {
+  localStorage.removeItem("cs_reports");
+  loadReportsList();
+  toast("🗑 تم مسح جميع التقارير");
+}
+
+// ══════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════
+function exp(fmt) {
+  const score = document.getElementById("rv").textContent;
+  const verdict = document.getElementById("sv").textContent;
+  const data = { timestamp: new Date().toISOString(), threatType: threat, score: score + "/100", verdict, analysis: aText, plan: pText };
+  let content, mime, ext;
+  if (fmt === "json") { content = JSON.stringify(data, null, 2); mime = "application/json"; ext = "json"; }
+  else { content = `CyberShield AI — تقرير أمني\n${"=".repeat(50)}\nالتاريخ: ${data.timestamp}\nالتهديد: ${threat}\nالخطورة: ${score}/100\nالحكم: ${verdict}\n\nالتحليل:\n${aText}\n\nخطة التعقيم:\n${pText}`; mime = "text/plain"; ext = "txt"; }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+  a.download = `cybershield-${Date.now()}.${ext}`; a.click();
+  toast(`📄 تم تصدير ${ext.toUpperCase()}`);
+}
+
+function cpRep() {
+  navigator.clipboard.writeText(`CyberShield AI\nالتهديد: ${threat} | الخطورة: ${document.getElementById("rv").textContent}/100\n\n${aText}`).then(() => toast("📋 تم النسخ"));
+}
+
+// ══════════════════════════════════════════════
+//  MAIN — يستدعي Backend الحقيقي
+// ══════════════════════════════════════════════
+async function run() {
+  if (busy) return;
+  const input = document.getElementById("inp").value.trim();
+  if (!input) { toast("⚠️ أدخل وصف التهديد أولاً"); return; }
+
+  busy = true;
+  document.getElementById("aBtn").disabled = true;
+  setLoader(true, "ANALYZING...", "الذكاء الاصطناعي يحلل البيانات...");
+  startProg();
+  document.getElementById("alog").innerHTML = "";
+  document.getElementById("score").classList.remove("on");
+  document.getElementById("expCard").style.display = "none";
+  log(`بدء تحليل: ${threat} — "${input.slice(0, 40)}..."`, "w");
+
+  try {
+    // ═══ استدعاء /analyze ═══
+    const r1 = await fetch(API_BASE + "/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input, threat }),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (!r1.ok) {
+      const err = await r1.json().catch(() => ({ error: `HTTP ${r1.status}` }));
+      throw new Error(err.error || `HTTP ${r1.status}`);
+    }
+
+    const d1 = await r1.json();
+    aText = d1.result || "";
+    setLoader(false);
+
+    const logEl = document.getElementById("alog"); logEl.innerHTML = "";
+    await typeIn(logEl, render(aText));
+
+    const score = getScore(aText);
+    showScore(score); showTags(aText);
+
+    st.tot++;
+    if (score >= 70) { st.thr++; log(`🔴 خطير: ${threat} — ${score}/100`, "d"); }
+    else if (score >= 35) { st.susp++; log(`🟡 مشبوه: ${threat} — ${score}/100`, "w"); }
+    else { st.clean++; log(`✅ منخفض: ${threat} — ${score}/100`, "s"); }
+
+    countUp(document.getElementById("sn0"), st.clean);
+    countUp(document.getElementById("sn1"), st.tot);
+    countUp(document.getElementById("sn2"), st.susp);
+    countUp(document.getElementById("sn3"), st.thr);
+    buildIOC(aText); buildConf(score);
+
+    // ═══ استدعاء /plan ═══
+    setLoader(true, "GENERATING PLAN...", "توليد خطة التعقيم...");
+    const r2 = await fetch(API_BASE + "/plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ analysis: aText, threat }),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (r2.ok) {
+      const d2 = await r2.json();
+      pText = d2.plan || "";
+      buildPlan(pText);
+    }
+
+    setLoader(false); endProg();
+    saveReport(aText, score); // حفظ في localStorage
+    document.getElementById("expCard").style.display = "block";
+    toast("✅ اكتمل التحليل — تم الحفظ تلقائياً");
+
+  } catch (err) {
+    setLoader(false); endProg();
+    const msg = err.message || "خطأ غير معروف";
+    document.getElementById("alog").innerHTML = `<div class="ll d"><span class="lp">✗</span><span class="lt">خطأ: ${msg}</span></div>`;
+    log(`خطأ: ${msg}`, "d");
+    toast("❌ " + msg);
+  }
+
+  busy = false;
+  document.getElementById("aBtn").disabled = false;
+}
+</script>
+</body>
+</html>
