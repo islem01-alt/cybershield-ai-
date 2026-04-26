@@ -28,7 +28,7 @@ app.use(cors({
 app.use(express.json({ limit: "50kb" }));
 
 // ══ STATIC — يخدم index.html ══
-app.use(express.static(join(__dirname, "public")));
+app.use(express.static(__dirname));
 
 // ══ RATE LIMITING بسيط (حماية من الإفراط) ══
 const requestCounts = new Map();
