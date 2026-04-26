@@ -15,7 +15,7 @@ const app = express();
 
 // ══ CONFIG ══
 // ⚠️ ضع مفتاح API هنا — أو استخدم متغيرات البيئة (أفضل)
-const CLAUDE_API_KEY = "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";
+const CLAUDE_APT_KEY= process.env.CLAUDE_API_KEY;
 const PORT = process.env.PORT || 3000;
 const CLAUDE_MODEL = "claude-3-haiku-20240307"; // أسرع وأرخص
 
