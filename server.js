@@ -3,19 +3,26 @@
 // ║          Node.js + Express + Claude API                  ║
 // ╚══════════════════════════════════════════════════════════╝
 
-import express from "express";
-import fetch from "node-fetch";
-import cors from "cors";
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const express = require('express');
+const path = require('path');
 const app = express();
+
+// خدمة الملفات الثابتة
+app.use(express.static(path.join(__dirname)));
+
+// إرسال index.html لأي طلب
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
 // ══ CONFIG ══
 // ⚠️ ضع مفتاح API هنا — أو استخدم متغيرات البيئة (أفضل)
-const CLAUDE_APT_KEY= process.env.CLAUDE_API_KEY;
+const CLAUDE_API_KEY = "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";
 const PORT = process.env.PORT || 3000;
 const CLAUDE_MODEL = "claude-3-haiku-20240307"; // أسرع وأرخص
 
