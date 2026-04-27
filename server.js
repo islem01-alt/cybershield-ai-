@@ -199,3 +199,20 @@ app.listen(PORT, () => {
   console.log(`║     API Key: ${CLAUDE_API_KEY !== "PUT_YOUR_KEY_HERE" ? "✅ Configured" : "❌ NOT SET"} ║`);
   console.log("╚════════════════════════════════════╝");
 });
+// يجب أن يكون هناك استماع على المنفذ الصحيح
+const PORT = process.env.PORT || 3000;  // Render يستخدم process.env.PORT
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+const express = require('express');
+const path = require('path');
+const app = express();
+
+app.use(express.static(path.join(__dirname)));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
